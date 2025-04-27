@@ -24,15 +24,18 @@ class RegisterView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         logger.info(f"Register attempt: {request.data}")
+        logger.info(f"Request headers: {request.headers}")
         try:
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid():
                 user = serializer.save()
                 token, created = Token.objects.get_or_create(user=user)
-                return Response({
+                response_data = {
                     "user": UserSerializer(user, context=self.get_serializer_context()).data,
                     "token": token.key
-                }, status=status.HTTP_201_CREATED)
+                }
+                logger.info(f"User created successfully: {user.username}")
+                return Response(response_data, status=status.HTTP_201_CREATED)
             else:
                 logger.error(f"Serializer errors: {serializer.errors}")
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -46,21 +49,25 @@ class RegisterView(generics.CreateAPIView):
 @csrf_exempt
 def login_view(request):
     logger.info(f"Login attempt: {request.data}")
+    logger.info(f"Login request headers: {request.headers}")
     try:
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
+            logger.info(f"Attempting to authenticate user: {username}")
             user = authenticate(username=username, password=password)
             
             if user:
                 token, created = Token.objects.get_or_create(user=user)
+                logger.info(f"User {username} authenticated successfully, token: {token.key[:5]}...")
                 return Response({
                     'token': token.key,
                     'user_id': user.pk,
                     'username': user.username,
                     'user_type': user.user_type
                 })
+            logger.warning(f"Invalid login credentials for user: {username}")
             return Response(
                 {"error": "Invalid credentials"}, 
                 status=status.HTTP_401_UNAUTHORIZED

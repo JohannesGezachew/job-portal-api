@@ -56,10 +56,57 @@ def simple_test(request):
         "data_received": request.data if request.method == 'POST' else None
     })
 
+# Token test endpoint
+@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def token_test(request):
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header:
+        return Response({
+            "message": "No Authorization header found",
+            "instructions": "Add 'Authorization: Token your_token_here' to your request headers"
+        })
+    
+    try:
+        # Check if header starts with "Token "
+        if not auth_header.startswith('Token '):
+            return Response({
+                "message": "Invalid Authorization header format",
+                "correct_format": "Token your_token_here",
+                "current_header": auth_header
+            })
+        
+        # Extract token
+        token_key = auth_header.split(' ')[1]
+        from rest_framework.authtoken.models import Token
+        token = Token.objects.filter(key=token_key).first()
+        
+        if not token:
+            return Response({
+                "message": "Invalid token",
+                "token_received": token_key,
+                "suggestion": "Try logging in again to get a valid token"
+            })
+        
+        return Response({
+            "message": "Token is valid",
+            "user_id": token.user.id,
+            "username": token.user.username,
+            "user_type": token.user.user_type
+        })
+    except Exception as e:
+        return Response({
+            "message": "Error validating token",
+            "error": str(e),
+            "auth_header_received": auth_header
+        })
+
 urlpatterns = [
     path('', api_root, name='api_root'),  # Root URL pattern
     path('test-post/', test_post, name='test_post'),  # Test POST endpoint
     path('api-test/', simple_test, name='simple_test'),  # Direct test endpoint
+    path('token-test/', token_test, name='token_test'),  # Token validation test
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/companies/', include('companies.urls')),

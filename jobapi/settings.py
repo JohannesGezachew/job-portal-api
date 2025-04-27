@@ -27,14 +27,21 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$*zdzyk4o(nj911n9+@==
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', 'job-portal-api-cx5r.onrender.com']
 
 # Add your frontend domain when you have it
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     # sam the frontend domain here
+    "https://job-portal-api-cx5r.onrender.com",
+    # For Postman requests
+    "https://api.postman.com",
+    "https://postman.com"
 ]
+
+# Temporarily enable this for testing
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -174,9 +181,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
-
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
 
 # Custom user model
 AUTH_USER_MODEL = 'accounts.User'
