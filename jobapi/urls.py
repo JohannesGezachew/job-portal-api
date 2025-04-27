@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Simple view function for the root URL
 def api_root(request):
@@ -33,8 +34,16 @@ def api_root(request):
         }
     })
 
+# Test endpoint for POST requests
+@csrf_exempt
+def test_post(request):
+    if request.method == 'POST':
+        return JsonResponse({"message": "POST request received successfully"})
+    return JsonResponse({"message": "Use POST method for this endpoint"})
+
 urlpatterns = [
     path('', api_root, name='api_root'),  # Root URL pattern
+    path('test-post/', test_post, name='test_post'),  # Test POST endpoint
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/companies/', include('companies.urls')),
