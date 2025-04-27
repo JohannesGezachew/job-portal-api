@@ -20,6 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 # Simple view function for the root URL
 def api_root(request):
@@ -30,7 +33,8 @@ def api_root(request):
             "api": "/api/",
             "accounts": "/api/accounts/",
             "companies": "/api/companies/",
-            "jobs": "/api/jobs/"
+            "jobs": "/api/jobs/",
+            "test": "/api-test/"
         }
     })
 
@@ -41,9 +45,21 @@ def test_post(request):
         return JsonResponse({"message": "POST request received successfully"})
     return JsonResponse({"message": "Use POST method for this endpoint"})
 
+# Super simple test endpoint
+@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+def simple_test(request):
+    return Response({
+        "message": "API is working correctly",
+        "method": request.method,
+        "data_received": request.data if request.method == 'POST' else None
+    })
+
 urlpatterns = [
     path('', api_root, name='api_root'),  # Root URL pattern
     path('test-post/', test_post, name='test_post'),  # Test POST endpoint
+    path('api-test/', simple_test, name='simple_test'),  # Direct test endpoint
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/companies/', include('companies.urls')),
