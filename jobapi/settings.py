@@ -21,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$*zdzyk4o(nj911n9+@==p5cgcva(dbijly#y*+h)hudj=7pp*')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Add your frontend domain here
+    # sam the frontend domain here
 ]
 
 # Application definition
